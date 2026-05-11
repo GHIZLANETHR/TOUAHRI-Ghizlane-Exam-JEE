@@ -6,8 +6,10 @@ import org.enset.touahrighizlaneexam.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Configuration
@@ -23,7 +25,7 @@ public class DataInitializer {
             Client c2 = clientRepo.save(Client.builder().nom("Fatima").email("fatima@mail.com").build());
             Client c3 = clientRepo.save(Client.builder().nom("Youssef").email("youssef@mail.com").build());
 
-            // Contrats pour Ahmed
+            // Contrat Automobile pour Ahmed
             ContratAutomobile ca = new ContratAutomobile();
             ca.setId(UUID.randomUUID().toString());
             ca.setDateSouscription(new Date());
@@ -37,6 +39,7 @@ public class DataInitializer {
             ca.setModele("Clio");
             contratRepo.save(ca);
 
+            // Contrat Habitation pour Ahmed
             ContratHabitation ch = new ContratHabitation();
             ch.setId(UUID.randomUUID().toString());
             ch.setDateSouscription(new Date());
@@ -51,7 +54,7 @@ public class DataInitializer {
             ch.setSuperficie(90);
             contratRepo.save(ch);
 
-            // Contrats pour Fatima
+            // Contrat Santé pour Fatima
             ContratSante cs = new ContratSante();
             cs.setId(UUID.randomUUID().toString());
             cs.setDateSouscription(new Date());
@@ -64,6 +67,7 @@ public class DataInitializer {
             cs.setNbPersonnesCouvertes(4);
             contratRepo.save(cs);
 
+            // Contrat Automobile pour Fatima
             ContratAutomobile ca2 = new ContratAutomobile();
             ca2.setId(UUID.randomUUID().toString());
             ca2.setDateSouscription(new Date());
@@ -78,7 +82,7 @@ public class DataInitializer {
             ca2.setModele("Sandero");
             contratRepo.save(ca2);
 
-            // Contrats pour Youssef
+            // Contrat Habitation pour Youssef
             ContratHabitation ch2 = new ContratHabitation();
             ch2.setId(UUID.randomUUID().toString());
             ch2.setDateSouscription(new Date());
@@ -92,12 +96,33 @@ public class DataInitializer {
             ch2.setSuperficie(120);
             contratRepo.save(ch2);
 
-            // Paiements pour chaque contrat (3 paiements par contrat)
-            paiementRepo.save(Paiement.builder().date(new Date()).montant(800).typePaiement(TypePaiement.MENSUALITE).contrat(ca).build());
-            paiementRepo.save(Paiement.builder().date(new Date()).montant(800).typePaiement(TypePaiement.MENSUALITE).contrat(ca).build());
-            paiementRepo.save(Paiement.builder().date(new Date()).montant(3000).typePaiement(TypePaiement.PAIEMENT_ANNUEL).contrat(ch).build());
-            paiementRepo.save(Paiement.builder().date(new Date()).montant(1500).typePaiement(TypePaiement.MENSUALITE).contrat(cs).build());
-            paiementRepo.save(Paiement.builder().date(new Date()).montant(2000).typePaiement(TypePaiement.PAIEMENT_EXCEPTIONNEL).contrat(ca2).build());
+            // Paiements pour les contrats
+            paiementRepo.save(Paiement.builder()
+                    .date(new Date()).montant(800).typePaiement(TypePaiement.MENSUALITE).contrat(ca).build());
+            paiementRepo.save(Paiement.builder()
+                    .date(new Date()).montant(800).typePaiement(TypePaiement.MENSUALITE).contrat(ca).build());
+            paiementRepo.save(Paiement.builder()
+                    .date(new Date()).montant(3000).typePaiement(TypePaiement.PAIEMENT_ANNUEL).contrat(ch).build());
+            paiementRepo.save(Paiement.builder()
+                    .date(new Date()).montant(1500).typePaiement(TypePaiement.MENSUALITE).contrat(cs).build());
+            paiementRepo.save(Paiement.builder()
+                    .date(new Date()).montant(2000).typePaiement(TypePaiement.PAIEMENT_EXCEPTIONNEL).contrat(ca2).build());
+        };
+    }
+
+    @Bean
+    CommandLineRunner initUsers(AppUserRepository userRepo, AppRoleRepository roleRepo, PasswordEncoder pe) {
+        return args -> {
+            AppRole clientRole = roleRepo.save(AppRole.builder().roleName("ROLE_CLIENT").build());
+            AppRole employeRole = roleRepo.save(AppRole.builder().roleName("ROLE_EMPLOYE").build());
+            AppRole adminRole = roleRepo.save(AppRole.builder().roleName("ROLE_ADMIN").build());
+
+            userRepo.save(AppUser.builder().username("client").password(pe.encode("1234"))
+                    .email("client@mail.com").roles(List.of(clientRole)).build());
+            userRepo.save(AppUser.builder().username("employe").password(pe.encode("1234"))
+                    .email("employe@mail.com").roles(List.of(employeRole)).build());
+            userRepo.save(AppUser.builder().username("admin").password(pe.encode("1234"))
+                    .email("admin@mail.com").roles(List.of(clientRole, employeRole, adminRole)).build());
         };
     }
 }
