@@ -1,5 +1,4 @@
-package org.enset.touahrighizlaneexamjee;
-
+package org.enset.touahrighizlaneexam;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
